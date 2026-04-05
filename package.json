@@ -6,12 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18.17.0"
   },
   "dependencies": {
-    "next": "16.2.2",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "next": "^16.2.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "sanity": "latest",
+    "next-sanity": "latest",
+    "@sanity/image-url": "latest",
+    "@portabletext/react": "latest",
+    "zod": "latest",
+    "embla-carousel-react": "latest",
+    "@upstash/ratelimit": "latest",
+    "@upstash/redis": "latest",
+    "sharp": "latest"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -19,8 +32,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.2",
+    "eslint-config-next": "^16.2.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "autoprefixer": "^10.4.20",
+    "@lhci/cli": "^0.14.0"
   }
 }
