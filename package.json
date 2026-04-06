@@ -10,32 +10,35 @@
     "type-check": "tsc --noEmit"
   },
   "engines": {
-    "node": "20.0"
+    "node": ">=18.17.0"
   },
   "dependencies": {
+    "@portabletext/react": "latest",
+    "@sanity/image-url": "latest",
+    "@sanity/vision": "^5.19.0",
+    "@upstash/ratelimit": "latest",
+    "@upstash/redis": "latest",
+    "embla-carousel-react": "latest",
     "next": "^16.2.2",
+    "next-sanity": "latest",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "sanity": "latest",
-    "next-sanity": "latest",
-    "@sanity/image-url": "latest",
-    "@portabletext/react": "latest",
-    "zod": "latest",
-    "embla-carousel-react": "latest",
-    "@upstash/ratelimit": "latest",
-    "@upstash/redis": "latest",
-    "sharp": "latest"
+    "sharp": "latest",
+    "styled-components": "^6.3.12",
+    "zod": "latest"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.14.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/styled-components": "latest",
+    "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "^16.2.2",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "autoprefixer": "^10.4.20",
-    "@lhci/cli": "^0.14.0"
+    "typescript": "^5"
   }
 }

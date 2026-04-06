@@ -3,9 +3,9 @@ import { sanityClient } from '@/lib/sanity'
 
 export const revalidate = 86400
 
-// FIX 6: normalise trailing slash + hard fallback so URLs in the sitemap
-// are always absolute — relative URLs are invalid per sitemap protocol
-// and cause Google Search Console to reject the entire file silently.
+// Normalise trailing slash + hard fallback so URLs in the sitemap are always
+// absolute — relative URLs are invalid per sitemap protocol and cause Google
+// Search Console to reject the entire file silently.
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
   'https://ngcinstitute.in'
@@ -48,34 +48,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
       changeFrequency: 'monthly',
     },
-    {
-      url: `${BASE_URL}/courses`,
-      priority: 0.9,
-      changeFrequency: 'weekly',
-    },
+    // Note: /courses is included only once app/courses/page.tsx is built.
+    // Submitting a URL that returns 404 creates a Search Console coverage error.
   ]
 
   // ── Dynamic: courses ─────────────────────────────────────────────────────
   let courseRoutes: MetadataRoute.Sitemap = []
   try {
+    // Issue 8 fixed: perspective:'published' prevents draft courses appearing
+    // Issue 9 fixed: cache:'force-cache' + tags prevents hammering Sanity on
+    //                every sitemap request
     const courses = await sanityClient.fetch<CourseResult[]>(
       `*[_type == "course"]{
         classGroup,
         "subject": subjectSlug.current
-      }`
+      }`,
+      {},
+      {
+        cache: 'force-cache',
+        next: { tags: ['courses'] },
+        perspective: 'published',
+      },
     )
     courseRoutes = courses
       .filter((c) => c.classGroup && c.subject)
       .map((c) => ({
-        // FIX 8: encode both segments — Sanity values like "Class 9" or
-        // "Grade 10+" contain spaces/special chars that break sitemap URLs
+        // Issue 7 fixed: both segments encoded — values like "Class 9" or
+        // slugs with unexpected characters produce valid sitemap URLs
         url: `${BASE_URL}/courses/${encodeURIComponent(c.classGroup)}/${encodeURIComponent(c.subject)}`,
         priority: 1.0,
         changeFrequency: 'weekly' as const,
       }))
   } catch (err) {
-    // FIX 7: log so GROQ errors / misconfigurations leave a trace in
-    // production logs rather than silently producing an empty section
+    // Log so GROQ errors leave a trace in production logs rather than
+    // silently producing an empty section
     console.error('[sitemap] Failed to fetch courses:', err)
     courseRoutes = []
   }
@@ -87,18 +93,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       `*[_type == "blogPost"]{
         "slug": slug.current,
         publishedDate
-      }`
+      }`,
+      {},
+      {
+        cache: 'force-cache',
+        next: { tags: ['blog'] },
+        perspective: 'published',
+      },
     )
     blogRoutes = posts
       .filter((p) => p.slug)
       .map((p) => ({
-        url: `${BASE_URL}/blog/${p.slug}`,
+        // Issue 7 fixed: slug encoded — unexpected characters break sitemap URLs
+        url: `${BASE_URL}/blog/${encodeURIComponent(p.slug)}`,
         priority: 0.8,
         changeFrequency: 'monthly' as const,
         ...(p.publishedDate && { lastModified: new Date(p.publishedDate) }),
       }))
   } catch (err) {
-    // FIX 7: same — log rather than silently swallow
     console.error('[sitemap] Failed to fetch blog posts:', err)
     blogRoutes = []
   }
